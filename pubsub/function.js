@@ -54,7 +54,7 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
     const resp = await fetch(url, { headers, body, method: 'POST' })
     if (resp.status === 200) {
       const { receivedMessages } = await resp.json()
-      log('receivedMessages', receivedMessages)
+      // log('receivedMessages', receivedMessages)
       if (!receivedMessages || !receivedMessages.length) {
         if (retry > 0) {
           return await getMessage(retry - 1)
@@ -65,7 +65,7 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
       } else {
         const msg = receivedMessages[0].message
         await ackMessage(msg)
-        return msg.attributes.id === id
+        return msg.attributes.id
       }
     } else if (resp.status === 404 && retry > 0) {
       return await setTimeoutAsync(
