@@ -1,17 +1,19 @@
 async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
-  if (!id.value) {
+  apikey = apikey.value
+  id = id.value
+  retries = retries.value || 5
+  isCreateTopic = isCreateTopic.value || false
+  isCreateSub = isCreateSub.value || false
+
+  if (!id) {
     log('ID is missing')
     return false
   }
 
-  if (!apikey.value) {
+  if (!apikey) {
     log('apikey missing')
     return false
   }
-
-  retries = retries.value || 5
-  isCreateTopic = isCreateTopic.value || false
-  isCreateSub = isCreateSub || false
 
   const urlToken =
     'https://europe-west3-covessa-sql.cloudfunctions.net/covessa-mq-dev-covessamq'
@@ -19,8 +21,8 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   const urlApi = 'https://pubsub.googleapis.com/v1'
 
   const project = 'projects/covessa-sql'
-  const subName = `${project}/subscriptions/sub-${id.value}`
-  const topicName = `${project}/topics/topic-${id.value}`
+  const subName = `${project}/subscriptions/sub-${id}`
+  const topicName = `${project}/topics/topic-${id}`
   const urlSub = `${urlApi}/${subName}`
   const urlTopic = `${urlApi}/${topicName}`
 
@@ -29,7 +31,7 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   let headers
 
   try {
-    const resp = await fetch(urlToken + '?apikey=' + apikey.value)
+    const resp = await fetch(urlToken + '?apikey=' + apikey)
     headers = await resp.json()
     await initialise()
     const msg = await getMessage(retries)
@@ -42,7 +44,7 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   }
 
   async function getMessage(retry) {
-    log('Pulling message for', id.value)
+    log('Pulling message for', id)
     const url = urlSub + ':pull'
     const body = JSON.stringify({
       returnImmediately: false,
@@ -62,9 +64,8 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
         }
       } else {
         const msg = receivedMessages[0].message
-        const id = msg.attributes.id
         await ackMessage(msg)
-        return id === id.value
+        return msg.attributes.id === id
       }
     } else if (resp.status === 404 && retry > 0) {
       return await setTimeoutAsync(
@@ -89,8 +90,8 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   async function destroy() {
     log('Destroying topic and subscription')
     try {
-      isCreateTopic && (await fetch(urlSub, { headers, method: 'DELETE' }))
-      isCreateSub && (await fetch(urlTopic, { headers, method: 'DELETE' }))
+      isCreateSub && (await fetch(urlSub, { headers, method: 'DELETE' }))
+      isCreateTopic && (await fetch(urlTopic, { headers, method: 'DELETE' }))
     } catch (e) {
       log(e)
     }
