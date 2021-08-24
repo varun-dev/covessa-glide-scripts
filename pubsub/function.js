@@ -39,7 +39,7 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
     await destroy()
     return msg
   } catch (e) {
-    log(e)
+    log('Unhandled Error\n', e)
     return false
   }
 
@@ -88,10 +88,15 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   }
 
   async function destroy() {
-    log('Destroying topic and subscription')
     try {
-      isCreateSub && (await fetch(urlSub, { headers, method: 'DELETE' }))
-      isCreateTopic && (await fetch(urlTopic, { headers, method: 'DELETE' }))
+      if (isCreateSub) {
+        log('Destroying subscription')
+        await fetch(urlSub, { headers, method: 'DELETE' })
+      }
+      if (isCreateTopic) {
+        log('Destroying topic')
+        await fetch(urlTopic, { headers, method: 'DELETE' })
+      }
     } catch (e) {
       log(e)
     }
@@ -100,16 +105,24 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   async function initialise() {
     if (isCreateTopic) {
       log('Creating topic')
-      const respTopic = await fetch(urlTopic, { headers, method: 'PUT' })
-      if (respTopic.status === 409)
+      const resp = await fetch(urlTopic, { headers, method: 'PUT' })
+      const json = await resp.json()
+      if (resp.status === 409)
         log('Topic already exist. This should not happen')
+      if (resp.status !== 200) {
+        throw json.error
+      }
     }
     if (isCreateSub) {
       log('Creating subscription')
       const body = JSON.stringify({ topic: topicName })
-      const respSub = await fetch(urlSub, { headers, method: 'PUT', body })
-      if (respSub.status === 409)
+      const resp = await fetch(urlSub, { headers, method: 'PUT', body })
+      const json = await resp.json()
+      if (resp.status === 409)
         log('Subscription already exist. This should not happen')
+      if (resp.status !== 200) {
+        throw json.error
+      }
     }
   }
 
