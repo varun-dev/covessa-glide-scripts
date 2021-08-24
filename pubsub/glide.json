@@ -1,0 +1,35 @@
+{
+  "name": "Messaging",
+  "description": "Gets a message from Google Pubsub (Ver 0.1)",
+  "author": "Varun Dev <varun.dev@hotmail.com>",
+  "params": [
+    {
+      "name": "id",
+      "displayName": "ID",
+      "type": "string"
+    },
+    {
+      "name": "apikey",
+      "displayName": "API Key",
+      "type": "string"
+    },
+    {
+      "name": "retries",
+      "displayName": "Retries",
+      "type": "number"
+    },
+    {
+      "name": "createTopic",
+      "displayName": "Create topic",
+      "type": "boolean"
+    },
+    {
+      "name": "createSub",
+      "displayName": "Create Sub",
+      "type": "boolean"
+    }
+  ],
+  "result": {
+    "type": "string"
+  }
+}
