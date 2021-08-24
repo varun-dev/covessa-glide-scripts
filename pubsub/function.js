@@ -1,10 +1,4 @@
-async function App(
-  apikey,
-  id,
-  retries = { value: 5 },
-  isCreateTopic = { value: false },
-  isCreateSub = { value: false }
-) {
+async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   if (!id.value) {
     log('ID is missing')
     return false
@@ -14,6 +8,10 @@ async function App(
     log('apikey missing')
     return false
   }
+
+  retries = retries.value || 5
+  isCreateTopic = isCreateTopic.value || false
+  isCreateSub = isCreateSub || false
 
   const urlToken =
     'https://europe-west3-covessa-sql.cloudfunctions.net/covessa-mq-dev-covessamq'
@@ -34,7 +32,7 @@ async function App(
     const resp = await fetch(urlToken + '?apikey=' + apikey.value)
     headers = await resp.json()
     await initialise()
-    const msg = await getMessage(retries.value)
+    const msg = await getMessage(retries)
     log('Response: ', msg)
     await destroy()
     return msg
@@ -80,7 +78,7 @@ async function App(
   }
 
   async function ackMessage(msg) {
-    if (!isCreateSub.value) return
+    if (!isCreateSub) return
     const url = urlSub + ':acknowledge'
     const body = JSON.stringify({
       ackIds: [msg.ackId],
@@ -91,23 +89,21 @@ async function App(
   async function destroy() {
     log('Destroying topic and subscription')
     try {
-      isCreateTopic.value &&
-        (await fetch(urlSub, { headers, method: 'DELETE' }))
-      isCreateSub.value &&
-        (await fetch(urlTopic, { headers, method: 'DELETE' }))
+      isCreateTopic && (await fetch(urlSub, { headers, method: 'DELETE' }))
+      isCreateSub && (await fetch(urlTopic, { headers, method: 'DELETE' }))
     } catch (e) {
       log(e)
     }
   }
 
   async function initialise() {
-    if (isCreateTopic.value) {
+    if (isCreateTopic) {
       log('Creating topic')
       const respTopic = await fetch(urlTopic, { headers, method: 'PUT' })
       if (respTopic.status === 409)
         log('Topic already exist. This should not happen')
     }
-    if (isCreateSub.value) {
+    if (isCreateSub) {
       log('Creating subscription')
       const body = JSON.stringify({ topic: topicName })
       const respSub = await fetch(urlSub, { headers, method: 'PUT', body })

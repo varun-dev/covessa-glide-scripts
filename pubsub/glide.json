@@ -1,6 +1,6 @@
 {
   "name": "Messaging",
-  "description": "Covessa Glideapps client for Google Pubsub (Ver 0.3)",
+  "description": "Covessa Glideapps client for Google Pubsub (Ver 0.4)",
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
     {
