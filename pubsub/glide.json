@@ -1,16 +1,16 @@
 {
   "name": "Messaging",
-  "description": "Gets a message from Google Pubsub (Ver 0.1)",
+  "description": "Gets a message from Google Pubsub (Ver 0.2)",
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
     {
-      "name": "id",
-      "displayName": "ID",
+      "name": "apikey",
+      "displayName": "API Key",
       "type": "string"
     },
     {
-      "name": "apikey",
-      "displayName": "API Key",
+      "name": "id",
+      "displayName": "ID",
       "type": "string"
     },
     {
