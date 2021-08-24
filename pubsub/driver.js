@@ -4,6 +4,8 @@ window.addEventListener('message', async function (event) {
     data: { key, params },
   } = event
 
+  console.debug('Message\n', params)
+
   let result
   try {
     result = await window.__function(...params)
