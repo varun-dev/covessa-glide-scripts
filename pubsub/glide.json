@@ -1,6 +1,6 @@
 {
   "name": "Messaging",
-  "description": "Covessa Glideapps client for Google Pubsub (Ver 0.7)",
+  "description": "Covessa Glideapps client for Google Pubsub (Ver 0.8)",
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
     {
@@ -26,6 +26,16 @@
     {
       "name": "createSub",
       "displayName": "Create Sub",
+      "type": "boolean"
+    },
+    {
+      "name": "deleteTopic",
+      "displayName": "Delete topic",
+      "type": "boolean"
+    },
+    {
+      "name": "deleteSub",
+      "displayName": "Delete Sub",
       "type": "boolean"
     }
   ],

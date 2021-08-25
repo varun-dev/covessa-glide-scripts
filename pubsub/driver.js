@@ -4,12 +4,13 @@ window.addEventListener('message', async function (event) {
     data: { key, params },
   } = event
 
-  console.debug('Message\n', params)
+  // console.debug('%cMessage\n' + JSON.stringify(params, null, 2), 'color: cyan')
 
   let result
   try {
     result = await window.__function(...params)
   } catch (e) {
+    console.error(e)
     result = undefined
   }
 

@@ -1,9 +1,25 @@
-async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
+async function App(
+  apikey,
+  id,
+  retries,
+  isCreateTopic,
+  isCreateSub,
+  isDeleteTopic,
+  isDeleteSub
+) {
   apikey = apikey.value
   id = id.value
-  retries = retries.value || 5
   isCreateTopic = isCreateTopic.value || false
   isCreateSub = isCreateSub.value || false
+  isDeleteTopic = isDeleteTopic.value || isCreateTopic
+  isDeleteSub = isDeleteSub.value || isCreateSub
+  retries = retries.value
+    ? retries.value === -1
+      ? Infinity
+      : retries.value
+    : 5
+
+  const log = getLogger()
 
   if (!id) {
     log('ID is missing')
@@ -31,20 +47,32 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   let headers
 
   try {
-    const resp = await fetch(urlToken + '?apikey=' + apikey)
-    headers = await resp.json()
+    const headers = await getToken()
     await initialise()
+    log('Awaiting message for ' + id)
     const msg = await getMessage(retries)
-    log('Response: ', msg)
+    log('Response: ' + msg)
     await destroy()
     return msg
   } catch (e) {
-    log('Unhandled Error\n', e)
+    log('Unhandled Error\n' + JSON.stringify(e, null, 2))
     return false
   }
 
+  async function getToken() {
+    let resp
+    try {
+      resp = await fetch(urlToken + '?apikey=' + apikey)
+    } catch (e) {
+      throw 'Unexpected Error while fetching Token'
+    }
+    headers = await resp.json()
+    if (resp.status === 403) throw 'Likely wrong API Key'
+    if (resp.status !== 200) throw `HTTP Error ${resp.status} in getting token`
+    return headers
+  }
+
   async function getMessage(retry) {
-    log('Pulling message for', id)
     const url = urlSub + ':pull'
     const body = JSON.stringify({
       returnImmediately: false,
@@ -52,14 +80,14 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
     })
 
     const resp = await fetch(url, { headers, body, method: 'POST' })
+    const json = await resp.json()
     if (resp.status === 200) {
-      const { receivedMessages } = await resp.json()
+      const { receivedMessages } = json
       // log('receivedMessages', receivedMessages)
       if (!receivedMessages || !receivedMessages.length) {
         if (retry > 0) {
           return await getMessage(retry - 1)
         } else {
-          log('No Booking')
           return false
         }
       } else {
@@ -73,7 +101,7 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
         NOT_FOUND_RETRY_DELAY
       )
     } else {
-      log('Error ' + resp.status)
+      log('Error\n' + JSON.stringify(json.error, null, 2))
       return false
     }
   }
@@ -88,39 +116,35 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
   }
 
   async function destroy() {
-    try {
-      if (isCreateSub) {
-        log('Destroying subscription')
-        await fetch(urlSub, { headers, method: 'DELETE' })
-      }
-      if (isCreateTopic) {
-        log('Destroying topic')
-        await fetch(urlTopic, { headers, method: 'DELETE' })
-      }
-    } catch (e) {
-      log(e)
+    if (isDeleteSub) {
+      log('Deleting subscription for ' + id)
+      await fetch(urlSub, { headers, method: 'DELETE' })
+    }
+    if (isDeleteTopic) {
+      log('Deleting topic for ' + id)
+      await fetch(urlTopic, { headers, method: 'DELETE' })
     }
   }
 
   async function initialise() {
     if (isCreateTopic) {
-      log('Creating topic')
+      log('Creating topic for ' + id)
       const resp = await fetch(urlTopic, { headers, method: 'PUT' })
       const json = await resp.json()
       if (resp.status === 409)
         log('Topic already exist. This should not happen')
-      if (resp.status !== 200) {
+      else if (resp.status !== 200) {
         throw json.error
       }
     }
     if (isCreateSub) {
-      log('Creating subscription')
+      log('Creating subscription for ' + id)
       const body = JSON.stringify({ topic: topicName })
       const resp = await fetch(urlSub, { headers, method: 'PUT', body })
       const json = await resp.json()
       if (resp.status === 409)
         log('Subscription already exist. This should not happen')
-      if (resp.status !== 200) {
+      else if (resp.status !== 200) {
         throw json.error
       }
     }
@@ -137,10 +161,22 @@ async function App(apikey, id, retries, isCreateTopic, isCreateSub) {
       )
     })
   }
-}
 
-function log(...arg) {
-  console.debug(...arg)
+  function getLogger() {
+    // const randomColor = Math.floor(Math.random() * 16777215).toString(16)
+    const randomColor =
+      'hsl(' +
+      360 * Math.random() +
+      ',' +
+      (25 + 70 * Math.random()) +
+      '%,' +
+      (50 + 10 * Math.random()) +
+      '%)'
+    return function log(msg) {
+      // console.debug(msg)
+      console.debug('%c' + msg, 'color:' + randomColor)
+    }
+  }
 }
 
 window.__function = App

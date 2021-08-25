@@ -1,6 +1,7 @@
 window.onload = function () {
   window.addEventListener('message', async function (event) {
-    document.getElementById('response').value = event.data.result.value
+    document.getElementById('response').value =
+      event.data.result && event.data.result.value
   })
 
   document.getElementById('testName').onchange = execute
