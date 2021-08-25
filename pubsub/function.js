@@ -95,12 +95,12 @@ async function App(
         await ackMessage(msg)
         return msg.attributes.id
       }
-    } else if (resp.status === 404 && retry > 0) {
+    } /* else if (resp.status === 404 && retry > 0) {
       return await setTimeoutAsync(
         getMessage.bind(null, retry - 1),
         NOT_FOUND_RETRY_DELAY
       )
-    } else {
+    }*/ else {
       log('Error\n' + JSON.stringify(json.error, null, 2))
       return false
     }
@@ -150,17 +150,17 @@ async function App(
     }
   }
 
-  function setTimeoutAsync(fn, delay) {
-    return new Promise((resolve, reject) => {
-      setTimeout(
-        () =>
-          fn()
-            .then(r => resolve(r))
-            .catch(e => reject(e)),
-        delay
-      )
-    })
-  }
+  // function setTimeoutAsync(fn, delay) {
+  //   return new Promise((resolve, reject) => {
+  //     setTimeout(
+  //       () =>
+  //         fn()
+  //           .then(r => resolve(r))
+  //           .catch(e => reject(e)),
+  //       delay
+  //     )
+  //   })
+  // }
 
   function getLogger() {
     // const randomColor = Math.floor(Math.random() * 16777215).toString(16)
