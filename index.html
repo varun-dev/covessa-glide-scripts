@@ -4,30 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Test Glide Script</title>
+    <style>
+        label { display: inline-block;width: 200px}
+        input {width: 300px}
+    </style>
 </head>
 <body>
 <h1>Test Glide Script</h1>
 <select id="testName">
+    <option value="test">Test</option>
     <option value="pubsub">Pubsub</option>
-    <option value="agent">Agent</option>
 </select>
 <h4>Params</h4>
-<input class="param" id="key" type="text" value="apikey"/>
-<br/>
-<input class="param" id="id" type="text" value="agent-id-1234"/>
-<br/>
-<input class="param" id="retries" type="number" value="2"/>
-<br/>
-<input class="param" id="createTopic" type="number" value="0"/>
-<br/>
-<input class="param" id="createSub" type="number" value="1"/>
-<br/>
-<input class="param" id="deleteTopic" type="number" value="0"/>
-<br/>
-<input class="param" id="deleteSub" type="number" value="1"/>
+<div id="containerParams"></div>
 <br/>
 <br/>
-<input id="response" type="text" placeholder="Waiting for response"/>
+<label for="response">Response</label>
+<input id="response" type="text"/>
 <br/>
 <button id="buttontest">Test Again</button>
 <script src="test.js"></script>

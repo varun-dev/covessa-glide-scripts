@@ -21,13 +21,13 @@ async function App(
 
   const log = getLogger()
 
-  if (!id) {
-    log('ID is missing')
+  if (!apikey) {
+    log('apikey missing')
     return false
   }
 
-  if (!apikey) {
-    log('apikey missing')
+  if (!id) {
+    log('ID is missing')
     return false
   }
 
