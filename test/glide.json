@@ -4,8 +4,18 @@
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
     {
+      "name": "columnId",
+      "displayName": "Column Id",
+      "type": "string"
+    },
+    {
       "name": "delay",
       "displayName": "Delay (ms)",
+      "type": "number"
+    },
+    {
+      "name": "retries",
+      "displayName": "Retries",
       "type": "number"
     }
   ],

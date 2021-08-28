@@ -6,6 +6,7 @@ window.onload = async function () {
 
   document.getElementById('testName').onchange = changeTestName
   document.getElementById('buttontest').onclick = test
+  document.getElementById('buttonTestPrevious').onclick = testPrevious
 
   let testName
   await changeTestName()
@@ -34,6 +35,13 @@ window.onload = async function () {
     const els = document.querySelectorAll('.param')
     els.forEach(el => params.push(formatValue(el)))
     // console.log('Posting test message', { key, params })
+    window.localStorage.setItem('lastParams', JSON.stringify(params))
+    window.frames[0].postMessage({ key, params }, '*')
+  }
+
+  function testPrevious() {
+    const key = 'key-' + Math.floor(Math.random() * 10000)
+    const params = JSON.parse(window.localStorage.getItem('lastParams'))
     window.frames[0].postMessage({ key, params }, '*')
   }
 
@@ -55,6 +63,7 @@ window.onload = async function () {
     switch (el.type) {
       case 'number':
         value = parseInt(el.value)
+        break
       case 'checkbox':
         value = el.checked
     }
