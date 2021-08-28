@@ -1,22 +1,22 @@
-window.__function = function App(columnId, delay, retries, tools) {
-  const log = tools.getLogger()
+window.__function = async function App(delay, retries, options) {
+  const log = options.getLogger()
   retries = retries.value || 5
   delay = delay.value || 2000
-  let interrupt = false
-  const fn = async function GlideScriptTest(r2 = retries) {
-    log('Executing')
-    if (interrupt) throw { code: 'EXECUTION_INTERRUPTED' }
+  return GlideScriptTest(retries)
+
+  async function GlideScriptTest(r2 = retries) {
+    if (options.shouldStop()) {
+      log('Stopping thread')
+      throw { code: 'EXECUTION_INTERRUPTED' }
+    }
     if (r2 > 0) {
-      return await tools.setTimeoutAsync(
+      log('Executing thread')
+      return await options.setTimeoutAsync(
         GlideScriptTest.bind(null, r2 - 1),
         delay
       )
     }
+    log('Executing thread')
     return true
   }
-  const clear = function interruptScript() {
-    log('Stopping thread')
-    interrupt = true
-  }
-  return { fn, clear }
 }

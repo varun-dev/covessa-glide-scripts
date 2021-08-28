@@ -13,30 +13,32 @@ window.addEventListener('message', async function (event) {
 
   let result
   if (!params.length) throw '[Script Error] No parameters passed'
-  if (params[0].value === undefined)
+  const [columnId, ...otherParams] = params
+  if (!columnId.value)
     throw '[Script Error] First parameter column id is mandatory'
 
-  const { clear, fn } = window.__function(...params, tools)
+  let isStop = false
+  const shouldStop = () => isStop
+  const stop = () => (isStop = true)
 
-  const columnId = params[0].value
-  if (threads[columnId]) {
-    threads[columnId].clear()
-    delete threads[columnId]
+  const cid = columnId.value
+  if (threads[cid]) {
+    threads[cid].stop()
+    delete threads[cid]
   }
-  threads[columnId] = { clear }
-
-  // console.debug(
-  //   'Number of current threads: ',
-  //   Object.keys(window._glidedriver.threads).length
-  // )
+  threads[cid] = { stop }
 
   try {
-    result = await fn()
+    result = await window.__function(...otherParams, {
+      ...tools,
+      shouldStop,
+      columnId,
+    })
     const response = { key }
     if (result !== undefined) {
       response.result = { type: 'boolean', value: result }
     }
-    delete threads[columnId]
+    delete threads[cid]
     event.source.postMessage(response, '*')
   } catch (e) {
     if (e.code !== 'EXECUTION_INTERRUPTED') {
