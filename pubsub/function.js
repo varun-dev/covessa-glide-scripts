@@ -114,7 +114,8 @@ window.__function = async function App(
   }
 
   async function ackMessage(msg) {
-    if (!isCreateSub) return
+    if (isDeleteSub) return
+    log('Acknowledging message')
     const url = urlSub + ':acknowledge'
     const body = JSON.stringify({
       ackIds: [msg.ackId],
