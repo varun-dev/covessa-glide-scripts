@@ -36,7 +36,7 @@ window.addEventListener('message', async function (event) {
     })
     const response = { key }
     if (result !== undefined) {
-      response.result = { type: 'boolean', value: result }
+      response.result = { type: 'string', value: result }
     }
     delete threads[cid]
     event.source.postMessage(response, '*')

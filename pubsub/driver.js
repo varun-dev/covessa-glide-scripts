@@ -8,7 +8,7 @@ window.addEventListener('message', async function (event) {
 
   let result
   try {
-    result = await window.__function(...params)
+    result = await window._covessa.function(...params)
   } catch (e) {
     console.error(e)
     result = undefined

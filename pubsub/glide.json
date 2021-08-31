@@ -1,8 +1,13 @@
 {
   "name": "Messaging",
-  "description": "Covessa Glideapps client for Google Pubsub (Ver 0.9)",
+  "description": "Covessa Glideapps client for Google Pubsub (Ver 1.1)",
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
+    {
+      "name": "columnId",
+      "displayName": "Column Id",
+      "type": "string"
+    },
     {
       "name": "apikey",
       "displayName": "API Key",

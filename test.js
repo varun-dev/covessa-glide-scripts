@@ -10,16 +10,15 @@ window.onload = async function () {
 
   let testName
   await changeTestName()
-  await init()
 
   async function changeTestName() {
     testName = document.getElementById('testName').value
-    getFields(`/${testName}/glide.json`).then(
-      html => (document.getElementById('containerParams').innerHTML = html)
-    )
+    const html = await getFields(`/${testName}/glide.json`)
+    document.getElementById('containerParams').innerHTML = html
+    await initFrame()
   }
 
-  function init(cb) {
+  function initFrame() {
     return new Promise(resolve => {
       const iframeSrc = '/' + testName + '/index'
       // console.log('Setting iframe src ', iframeSrc)

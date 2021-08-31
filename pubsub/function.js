@@ -1,11 +1,12 @@
-async function App(
+window.__function = async function App(
   apikey,
   id,
   retries,
   isCreateTopic,
   isCreateSub,
   isDeleteTopic,
-  isDeleteSub
+  isDeleteSub,
+  options
 ) {
   apikey = apikey.value
   id = id.value
@@ -19,7 +20,7 @@ async function App(
       : retries.value
     : 5
 
-  const log = getLogger()
+  const log = options.getLogger()
 
   if (!apikey) {
     log('apikey missing')
@@ -47,7 +48,7 @@ async function App(
   let headers
 
   try {
-    const headers = await getToken()
+    headers = await getToken()
     await initialise()
     log('Awaiting message for ' + id)
     const msg = await getMessage(retries)
@@ -55,6 +56,7 @@ async function App(
     await destroy()
     return msg
   } catch (e) {
+    if (e.code === 'EXECUTION_INTERRUPTED') throw e
     log('Unhandled Error\n' + JSON.stringify(e, null, 2))
     return false
   }
@@ -66,13 +68,18 @@ async function App(
     } catch (e) {
       throw 'Unexpected Error while fetching Token'
     }
-    headers = await resp.json()
+    const data = await resp.json()
     if (resp.status === 403) throw 'Likely wrong API Key'
     if (resp.status !== 200) throw `HTTP Error ${resp.status} in getting token`
-    return headers
+    return data
   }
 
   async function getMessage(retry) {
+    if (options.shouldStop()) {
+      log('Stopping thread')
+      throw { code: 'EXECUTION_INTERRUPTED' }
+    }
+    log('Executing pull')
     const url = urlSub + ':pull'
     const body = JSON.stringify({
       returnImmediately: false,
@@ -93,7 +100,7 @@ async function App(
       } else {
         const msg = receivedMessages[0].message
         await ackMessage(msg)
-        return msg.attributes.id
+        return msg.attributes.clear || msg.attributes.id
       }
     } /* else if (resp.status === 404 && retry > 0) {
       return await setTimeoutAsync(
@@ -150,18 +157,6 @@ async function App(
     }
   }
 
-  // function setTimeoutAsync(fn, delay) {
-  //   return new Promise((resolve, reject) => {
-  //     setTimeout(
-  //       () =>
-  //         fn()
-  //           .then(r => resolve(r))
-  //           .catch(e => reject(e)),
-  //       delay
-  //     )
-  //   })
-  // }
-
   function getLogger() {
     // const randomColor = Math.floor(Math.random() * 16777215).toString(16)
     const randomColor =
@@ -178,5 +173,3 @@ async function App(
     }
   }
 }
-
-window.__function = App
