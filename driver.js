@@ -14,6 +14,7 @@ window.addEventListener('message', async function (event) {
   let result
   if (!params.length) throw '[Script Error] No parameters passed'
   const [columnId, ...otherParams] = params
+  const random = otherParams.pop()
   if (!columnId.value)
     throw '[Script Error] First parameter column id is mandatory'
 
@@ -27,7 +28,7 @@ window.addEventListener('message', async function (event) {
     delete threads[cid]
   }
   threads[cid] = { stop }
-
+  // console.debug('Random test ', otherParams, random)
   try {
     result = await window.__function(...otherParams, {
       ...tools,
