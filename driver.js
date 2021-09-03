@@ -15,8 +15,11 @@ window.addEventListener('message', async function (event) {
   if (!params.length) throw '[Script Error] No parameters passed'
   const [columnId, ...otherParams] = params
   const random = otherParams.pop()
-  if (!columnId.value)
-    throw '[Script Error] First parameter column id is mandatory'
+  if (!columnId.value) {
+    const msg = '[Script Error] First parameter column id is mandatory'
+    console.debug(msg)
+    throw msg
+  }
 
   let isStop = false
   const shouldStop = () => isStop
@@ -47,36 +50,3 @@ window.addEventListener('message', async function (event) {
     }
   }
 })
-
-window._glidedriver.tools.getLogger = function () {
-  // const randomColor = Math.floor(Math.random() * 16777215).toString(16)
-  const randomColor =
-    'hsl(' +
-    360 * Math.random() +
-    ',' +
-    (25 + 70 * Math.random()) +
-    '%,' +
-    (50 + 10 * Math.random()) +
-    '%)'
-
-  return function log(...args) {
-    const format = v => (typeof v === 'object' ? JSON.stringify(v, null, 2) : v)
-    const str = args.reduce((r, m) => r + '\n' + format(m), '')
-    console.debug('%c' + str, 'color:' + randomColor)
-  }
-}
-
-window._glidedriver.tools.setTimeoutAsync = function setTimeoutAsync(
-  fn,
-  delay
-) {
-  return new Promise((resolve, reject) => {
-    setTimeout(
-      () =>
-        fn()
-          .then(r => resolve(r))
-          .catch(e => reject(e)),
-      delay
-    )
-  })
-}

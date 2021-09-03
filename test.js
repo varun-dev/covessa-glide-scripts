@@ -1,21 +1,26 @@
 window.onload = async function () {
-  window.addEventListener('message', async function (event) {
-    document.getElementById('response').value =
-      event.data.result && event.data.result.value
-  })
-
-  document.getElementById('testName').onchange = changeTestName
-  document.getElementById('buttontest').onclick = test
-  document.getElementById('buttonTestPrevious').onclick = testPrevious
-
   let testName
-  await changeTestName()
+  await setTestName()
+  initHandlers()
+  return
 
-  async function changeTestName() {
+  async function setTestName() {
     testName = document.getElementById('testName').value
     const html = await getFields(`/${testName}/glide.json`)
     document.getElementById('containerParams').innerHTML = html
+    populateFields()
     await initFrame()
+  }
+
+  function initHandlers() {
+    window.addEventListener('message', async function (event) {
+      document.getElementById('response').value =
+        event.data.result && event.data.result.value
+    })
+    document.getElementById('testName').onchange = setTestName
+    document.getElementById('buttontest').onclick = test
+    document.getElementById('buttonTestPrevious').onclick = testPrevious
+    document.getElementById('buttonPublish').onclick = publishMessage
   }
 
   function initFrame() {
@@ -31,11 +36,20 @@ window.onload = async function () {
   function test() {
     const key = 'key-' + Math.floor(Math.random() * 10000)
     const params = []
-    const els = document.querySelectorAll('.param')
-    els.forEach(el => params.push(formatValue(el)))
+    document.getElementById('response').value = 'Waiting'
+    const elParams = document.querySelectorAll('.param')
+    elParams.forEach(el => params.push(getElValue(el)))
     // console.log('Posting test message', { key, params })
-    window.localStorage.setItem('lastParams', JSON.stringify(params))
+    window.localStorage.setItem(testName, JSON.stringify(params))
     window.frames[0].postMessage({ key, params }, '*')
+  }
+
+  function populateFields() {
+    const prevParams = window.localStorage.getItem(testName)
+    // console.log('prevParams', prevParams)
+    if (prevParams) {
+      JSON.parse(prevParams).forEach(setElValue)
+    }
   }
 
   function testPrevious() {
@@ -57,16 +71,31 @@ window.onload = async function () {
       ''
     )
   }
-  function formatValue(el) {
+  function getElValue(el) {
     let value = el.value
+    let type = 'string'
     switch (el.type) {
       case 'number':
         value = parseInt(el.value)
+        type = 'number'
         break
       case 'checkbox':
         value = el.checked
+        type = 'boolean'
     }
-    return { value }
+    return { value, type, key: el.id }
+  }
+
+  function setElValue({ type, value, key }) {
+    const el = document.getElementById(key)
+    if (!el) return
+    switch (type) {
+      case 'boolean':
+        el.checked = value
+        return
+      default:
+        el.value = value
+    }
   }
 
   function getType(type) {
@@ -75,5 +104,28 @@ window.onload = async function () {
       string: 'text',
       boolean: 'checkbox',
     }[type]
+  }
+
+  async function publishMessage() {
+    const id = document.getElementById('id').value
+    const apikey = document.getElementById('apikey').value
+    const urlToken =
+      'https://europe-west3-covessa-sql.cloudfunctions.net/covessa-mq-dev-covessamq'
+    const urlApi = 'https://pubsub.googleapis.com/v1'
+    const project = 'projects/covessa-sql'
+    const topicName = `${project}/topics/topic-${id}`
+    const urlTopic = `${urlApi}/${topicName}`
+
+    const headers = await window._covessa.tools.getToken(urlToken, apikey)
+    const body = JSON.stringify({ messages: [{ attributes: { id } }] })
+    console.debug('Publishing message for id: ', id)
+    const resp = await fetch(urlTopic + ':publish', {
+      headers,
+      body,
+      method: 'POST',
+    })
+    const json = await resp.json()
+    if (resp.status != 200) throw json.error
+    // console.debug('publishMessage', json)
   }
 }

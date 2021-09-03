@@ -20,7 +20,7 @@ window.__function = async function App(
       : retries.value
     : 5
 
-  const log = options.getLogger()
+  const log = window._covessa.tools.getLogger()
 
   if (!apikey) {
     log('apikey missing')
@@ -98,9 +98,9 @@ window.__function = async function App(
           return false
         }
       } else {
-        const msg = receivedMessages[0].message
-        await ackMessage(msg)
-        return msg.attributes.clear || msg.attributes.id
+        const { ackId, message } = receivedMessages[0]
+        await ackMessage(ackId)
+        return message.attributes.clear || message.attributes.id
       }
     } /* else if (resp.status === 404 && retry > 0) {
       return await setTimeoutAsync(
@@ -113,14 +113,14 @@ window.__function = async function App(
     }
   }
 
-  async function ackMessage(msg) {
-    if (isDeleteSub) return
+  async function ackMessage(ackId) {
+    if (isDeleteSub || !ackId) return
     log('Acknowledging message')
     const url = urlSub + ':acknowledge'
-    const body = JSON.stringify({
-      ackIds: [msg.ackId],
-    })
-    await fetch(url, { headers, body, method: 'POST' })
+    const body = JSON.stringify({ ackIds: [ackId] })
+    const resp = await fetch(url, { headers, body, method: 'POST' })
+    const json = await resp.json()
+    if (resp.status != 200) throw json.error
   }
 
   async function destroy() {
@@ -155,22 +155,6 @@ window.__function = async function App(
       else if (resp.status !== 200) {
         throw json.error
       }
-    }
-  }
-
-  function getLogger() {
-    // const randomColor = Math.floor(Math.random() * 16777215).toString(16)
-    const randomColor =
-      'hsl(' +
-      360 * Math.random() +
-      ',' +
-      (25 + 70 * Math.random()) +
-      '%,' +
-      (50 + 10 * Math.random()) +
-      '%)'
-    return function log(msg) {
-      // console.debug(msg)
-      console.debug('%c' + msg, 'color:' + randomColor)
     }
   }
 }
