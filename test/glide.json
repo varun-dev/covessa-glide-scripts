@@ -1,11 +1,16 @@
 {
   "name": "Simple glide script",
-  "description": "Returns a true after delay (Ver 0.8)",
+  "description": "Returns a true after delay (Ver 0.9)",
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
     {
       "name": "columnId",
       "displayName": "Column Id",
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "displayName": "Value",
       "type": "string"
     },
     {

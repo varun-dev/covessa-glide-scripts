@@ -1,4 +1,4 @@
-window.__function = async function App(delay, retries, options) {
+window.__function = async function App(value, delay, retries, options) {
   const log = window._covessa.tools.getLogger(options.columnId)
   retries = retries.value || 5
   delay = delay.value || 2000
@@ -17,6 +17,6 @@ window.__function = async function App(delay, retries, options) {
       )
     }
     log('Executing thread')
-    return true
+    return value.value
   }
 }
