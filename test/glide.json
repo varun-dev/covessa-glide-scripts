@@ -1,6 +1,6 @@
 {
   "name": "Simple glide script",
-  "description": "Returns a true after delay (Ver 0.9)",
+  "description": "Returns a true after delay (Ver 0.91)",
   "author": "Varun Dev <varun.dev@hotmail.com>",
   "params": [
     {
@@ -25,6 +25,6 @@
     }
   ],
   "result": {
-    "type": "boolean"
+    "type": "string"
   }
 }
