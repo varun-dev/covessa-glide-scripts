@@ -16,7 +16,7 @@ window.__function = async function App(value, delay, retries, options) {
         delay
       )
     }
-    log('Executing thread')
+    log('Sending back response: ', value.value)
     return value.value
   }
 }
