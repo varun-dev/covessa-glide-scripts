@@ -1,5 +1,6 @@
 window.onload = async function () {
   let testName
+  let startTime
   await setTestName()
   initHandlers()
   return
@@ -16,10 +17,11 @@ window.onload = async function () {
     window.addEventListener('message', async function (event) {
       document.getElementById('response').value =
         event.data.result && event.data.result.value
+      document.getElementById('testTime').value =
+        ((new Date().getTime() - startTime) / 1000).toFixed(2) + ' seconds'
     })
     document.getElementById('testName').onchange = setTestName
     document.getElementById('buttontest').onclick = test
-    document.getElementById('buttonTestPrevious').onclick = testPrevious
     document.getElementById('buttonPublish').onclick = publishMessage
   }
 
@@ -34,6 +36,7 @@ window.onload = async function () {
   }
 
   function test() {
+    startTime = new Date().getTime()
     const key = 'key-' + Math.floor(Math.random() * 10000)
     const params = []
     document.getElementById('response').value = 'Waiting'
@@ -50,12 +53,6 @@ window.onload = async function () {
     if (prevParams) {
       JSON.parse(prevParams).forEach(setElValue)
     }
-  }
-
-  function testPrevious() {
-    const key = 'key-' + Math.floor(Math.random() * 10000)
-    const params = JSON.parse(window.localStorage.getItem('lastParams'))
-    window.frames[0].postMessage({ key, params }, '*')
   }
 
   async function getFields(url) {
@@ -107,6 +104,7 @@ window.onload = async function () {
   }
 
   async function publishMessage() {
+    startTime = new Date().getTime()
     const id = document.getElementById('id').value
     const apikey = document.getElementById('apikey').value
     const urlToken =

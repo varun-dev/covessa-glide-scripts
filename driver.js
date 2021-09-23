@@ -1,8 +1,10 @@
-window._glidedriver = { threads: {}, tools: {} }
+window._covessa = window._covessa || {}
+window._covessa.threads = {}
+
 console.debug('Initialising script')
 
 window.addEventListener('message', async function (event) {
-  const { threads, tools } = window._glidedriver
+  const { threads } = window._covessa
 
   const {
     origin,
@@ -14,8 +16,8 @@ window.addEventListener('message', async function (event) {
   let result
   if (!params.length) throw '[Script Error] No parameters passed'
   const [columnId, ...otherParams] = params
-  const random = otherParams.pop()
-  if (!columnId.value) {
+  const cid = columnId.value
+  if (!cid) {
     const msg = '[Script Error] First parameter column id is mandatory'
     console.debug(msg)
     throw msg
@@ -25,7 +27,6 @@ window.addEventListener('message', async function (event) {
   const shouldStop = () => isStop
   const stop = () => (isStop = true)
 
-  const cid = columnId.value
   if (threads[cid]) {
     threads[cid].stop()
     delete threads[cid]
@@ -34,9 +35,8 @@ window.addEventListener('message', async function (event) {
   // console.debug('Random test ', otherParams, random)
   try {
     result = await window.__function(...otherParams, {
-      ...tools,
       shouldStop,
-      columnId,
+      columnId: cid,
     })
     const response = { key }
     if (result !== undefined) {

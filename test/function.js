@@ -1,5 +1,5 @@
 window.__function = async function App(delay, retries, options) {
-  const log = options.getLogger()
+  const log = window._covessa.tools.getLogger(options.columnId)
   retries = retries.value || 5
   delay = delay.value || 2000
   return GlideScriptTest(retries)
@@ -11,7 +11,7 @@ window.__function = async function App(delay, retries, options) {
     }
     if (r2 > 0) {
       log('Executing thread')
-      return await options.setTimeoutAsync(
+      return await window._covessa.tools.setTimeoutAsync(
         GlideScriptTest.bind(null, r2 - 1),
         delay
       )

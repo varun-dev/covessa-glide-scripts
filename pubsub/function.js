@@ -6,6 +6,7 @@ window.__function = async function App(
   isCreateSub,
   isDeleteTopic,
   isDeleteSub,
+  random,
   options
 ) {
   apikey = apikey.value
@@ -20,7 +21,7 @@ window.__function = async function App(
       : retries.value
     : 5
 
-  const log = window._covessa.tools.getLogger()
+  const log = window._covessa.tools.getLogger(options.columnId)
 
   if (!apikey) {
     log('apikey missing')

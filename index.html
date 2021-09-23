@@ -1,30 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <title>Test Glide Script</title>
-    <style>
-        label { display: inline-block;width: 200px}
-        input {width: 300px}
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Test Glide Script</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+  <style>
+      * {
+          font-family: 'Poppins', Verdana, serif;
+      }
+
+      label {
+          display: inline-block;
+          width: 200px
+      }
+
+      input {
+          width: 300px
+      }
+
+      .medium, button {
+          font-size: 1.2em
+      }
+  </style>
 </head>
 <body>
 <h1>Test Glide Script</h1>
-<select id="testName">
-    <option value="pubsub">Pubsub</option>
-    <option value="test">Test</option>
+<label for="testName"></label><select id="testName">
+  <option value="pubsub">Pubsub</option>
+  <option value="test">Test</option>
 </select>
-<h4>Params</h4>
 <div id="containerParams"></div>
 <br/>
 <br/>
-<label for="response">Response</label>
-<input id="response" type="text"/>
+<button id="buttontest">Test</button>
+<button id="buttonPublish">Publish</button>
 <br/>
-<button id="buttontest">Test</button><button id="buttonTestPrevious">Rerun previous test</button><button id="buttonPublish">Publish</button>
+<br/>
+<label class="medium" for="response">Response</label>
+<input class="medium" id="response" type="text"/>
+<label class="medium" for="testTime">Response Time</label>
+<input class="medium" id="testTime" type="text"/>
+<br/>
+
 <script src="tools.js"></script>
 <script src="test.js"></script>
-<iframe id="iframe" style="height: 100px;width:100%;"/>
+<iframe id="iframe" style="height: 100px;width:100%; display: none"></iframe>
 </body>
 </html>

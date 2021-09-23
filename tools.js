@@ -1,7 +1,7 @@
 window._covessa = window._covessa || {}
 const tools = (window._covessa.tools = window._covessa.tools || {})
 
-tools.getLogger = function () {
+tools.getLogger = function (cid) {
   // const randomColor = Math.floor(Math.random() * 16777215).toString(16)
   const randomColor =
     'hsl(' +
@@ -14,8 +14,11 @@ tools.getLogger = function () {
 
   return function log(...args) {
     const format = v => (typeof v === 'object' ? JSON.stringify(v, null, 2) : v)
-    const str = args.reduce((r, m) => r + '\n' + format(m), '')
-    console.debug('%c' + str, 'color:' + randomColor)
+    const str = args.reduce(
+      (r, m, i) => r + (i !== 0 ? '\n' : '') + format(m),
+      ''
+    )
+    console.debug('%c' + `[${cid}] ${str}`, 'color:' + randomColor)
   }
 }
 
