@@ -11,10 +11,13 @@ window.__function = async function App(
 ) {
   apikey = apikey.value
   id = id.value
-  isCreateTopic = isCreateTopic.value || false
-  isCreateSub = isCreateSub.value || false
-  isDeleteTopic = isDeleteTopic.value || isCreateTopic
-  isDeleteSub = isDeleteSub.value || isCreateSub
+  isCreateTopic =
+    isCreateTopic.value !== undefined ? isCreateTopic.value : false
+  isCreateSub = isCreateSub.value !== undefined ? isCreateSub.value : false
+  isDeleteTopic =
+    isDeleteTopic.value !== undefined ? isDeleteTopic.value : isCreateTopic
+  isDeleteSub =
+    isDeleteSub.value !== undefined ? isDeleteSub.value : isCreateSub
   retries = retries.value
     ? retries.value === -1
       ? Infinity
