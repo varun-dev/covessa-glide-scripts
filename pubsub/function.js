@@ -68,7 +68,8 @@ window.__function = async function App(
     return msg
   } catch (e) {
     if (e.code === 'EXECUTION_INTERRUPTED') throw e
-    log('Unhandled Error\n' + JSON.stringify(e, null, 2))
+    log('Unhandled Error')
+    console.error(e)
     return false
   }
 
