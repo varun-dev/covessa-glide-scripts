@@ -1,6 +1,7 @@
 window.__function = async function App(
   apikey,
   id,
+  filterAttr,
   retries,
   isCreateTopic,
   isCreateSub,
@@ -11,6 +12,7 @@ window.__function = async function App(
 ) {
   apikey = apikey.value
   id = id.value
+  filterAttr = filterAttr.value || 'id'
   isCreateTopic =
     isCreateTopic.value !== undefined ? isCreateTopic.value : false
   isCreateSub = isCreateSub.value !== undefined ? isCreateSub.value : false
@@ -22,7 +24,7 @@ window.__function = async function App(
     ? retries.value === -1
       ? Infinity
       : retries.value
-    : 5
+    : Infinity
 
   const log = window._covessa.tools.getLogger(options.columnId)
 
@@ -54,9 +56,14 @@ window.__function = async function App(
   try {
     headers = await getToken()
     await initialise()
-    log('Awaiting message for ' + id)
+    log(
+      'Awaiting message for',
+      'id: ' + id,
+      'attribute: ' + filterAttr,
+      'retries: ' + retries
+    )
     const msg = await getMessage(retries)
-    log('Response: ' + msg)
+    log('Response - ' + filterAttr + ' : ' + msg)
     await destroy()
     return msg
   } catch (e) {
@@ -94,17 +101,18 @@ window.__function = async function App(
     const json = await resp.json()
     if (resp.status === 200) {
       const { receivedMessages } = json
-      // log('receivedMessages', receivedMessages)
-      if (!receivedMessages || !receivedMessages.length) {
+      const filteredMsgs = filterMsgs(receivedMessages)
+      // log('filteredMsgs', filteredMsgs)
+      if (!filteredMsgs || !filteredMsgs.length) {
         if (retry > 0) {
           return await getMessage(retry - 1)
         } else {
           return false
         }
       } else {
-        const { ackId, message } = receivedMessages[0]
+        const { ackId, message } = filteredMsgs[0]
         await ackMessage(ackId)
-        return message.attributes.clear || message.attributes.id
+        return message.attributes[filterAttr]
       }
     } /* else if (resp.status === 404 && retry > 0) {
       return await setTimeoutAsync(
@@ -160,5 +168,11 @@ window.__function = async function App(
         throw json.error
       }
     }
+  }
+
+  function filterMsgs(msgs) {
+    return msgs.filter(
+      ({ message }) => message.attributes[filterAttr] !== undefined
+    )
   }
 }

@@ -107,6 +107,7 @@ window.onload = async function () {
     startTime = new Date().getTime()
     const id = document.getElementById('id').value
     const apikey = document.getElementById('apikey').value
+    const attr = document.getElementById('filterAttr').value || 'id'
     const urlToken =
       'https://europe-west3-covessa-sql.cloudfunctions.net/covessa-mq-dev-covessamq'
     const urlApi = 'https://pubsub.googleapis.com/v1'
@@ -115,8 +116,8 @@ window.onload = async function () {
     const urlTopic = `${urlApi}/${topicName}`
 
     const headers = await window._covessa.tools.getToken(urlToken, apikey)
-    const body = JSON.stringify({ messages: [{ attributes: { id } }] })
-    console.debug('Publishing message for id: ', id)
+    const body = JSON.stringify({ messages: [{ attributes: { [attr]: id } }] })
+    console.debug('Publishing message - ', attr + ':' + id)
     const resp = await fetch(urlTopic + ':publish', {
       headers,
       body,
