@@ -172,8 +172,9 @@ window.__function = async function App(
   }
 
   function filterMsgs(msgs) {
-    return msgs.filter(
-      ({ message }) => message.attributes[filterAttr] !== undefined
+    return (
+      msgs &&
+      msgs.filter(({ message }) => message.attributes[filterAttr] !== undefined)
     )
   }
 }
