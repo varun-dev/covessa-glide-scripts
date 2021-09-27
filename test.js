@@ -7,7 +7,7 @@ window.onload = async function () {
 
   async function setTestName() {
     testName = document.getElementById('testName').value
-    const html = await getFields(`/${testName}/glide.json`)
+    const html = await getFields(`${testName}/glide.json`)
     document.getElementById('containerParams').innerHTML = html
     populateFields()
     await initFrame()
