@@ -27,7 +27,7 @@ window.onload = async function () {
 
   function initFrame() {
     return new Promise(resolve => {
-      const iframeSrc = '/' + testName + '/index'
+      const iframeSrc = testName + '/index'
       // console.log('Setting iframe src ', iframeSrc)
       const ifr = document.getElementById('iframe')
       ifr.src = iframeSrc
